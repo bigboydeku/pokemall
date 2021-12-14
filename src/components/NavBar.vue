@@ -1,11 +1,11 @@
 <template>
-  <div class="flex-1 flex flex-col min-h-0 h-full bg-gray-800">
+  <div class="bg-gray-800 w-48">
     <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
       <div class="flex items-center flex-shrink-0 px-4">
-        <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg" alt="Workflow" />
+        <img class="h-14 w-auto" src="@/assets/pokemon_logo.png" alt="Pokemon" />
       </div>
-      <nav class="mt-5 flex-1 px-2 bg-gray-800 space-y-1" aria-label="Sidebar">
-        <router-link v-for="item in navigation" :key="item.name" :href="item.href" class-active="active" :to="item.name" :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group flex items-center px-2 py-2 text-sm font-medium rounded-md']">
+      <nav id="nav" class="mt-5 flex-1 px-2 bg-gray-800 space-y-1" aria-label="Sidebar">
+        <router-link v-for="item in navigation" :key="item.name" :href="item.href" class-active="active" :to="item.href" :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group flex items-center px-2 py-2 text-sm font-medium rounded-md']">
           <component :is="item.icon" :class="[item.current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300', 'mr-3 flex-shrink-0 h-6 w-6']" aria-hidden="true" />
           <span class="flex-1">
             {{ item.name }}
@@ -22,12 +22,10 @@
 
 <script>
 const navigation = [
-    { name: 'Dashboard', icon: null, href: '#', current: true },
-    { name: 'Team', icon: null, href: '#', current: false },
-    { name: 'Projects', icon: null, href: '#', current: false },
-    { name: 'Calendar', icon: null, href: '#', current: false },
-    { name: 'Documents', icon: null, href: '#', current: false },
-    { name: 'Reports', icon: null, href: '#', current: false },
+    { name: 'Home', icon: null, href: '/'},
+    { name: 'Pokemon', icon: null, href: '/pokemon'},
+    { name: 'Items', icon: null, href: '/items'},
+    { name: 'Moves', icon: null, href: '/moves'},
     ]
     const secondaryNavigation = [
     { name: 'Website redesign', href: '#' },
@@ -45,3 +43,9 @@ export default {
     }
 }
 </script>
+
+<style>
+  #nav a.router-link-exact-active {
+    background-color: red;
+  }
+</style>
