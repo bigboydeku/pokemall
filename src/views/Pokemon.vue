@@ -31,8 +31,8 @@
                 <h2 class="h-full text-xs text-gray-500 font-bold flex items-center">Sorted by ID</h2>
               </div>
 
-              <div class="px-4 py-2 overflow-auto ">
-                  <div class="rounded-md border border-gray-300 bg-white">
+              <div class="pb-2 overflow-auto ">
+                  <div class="bg-white">
                         <div class="hover:bg-red-100 border-b w-full py-1" v-for="(pokemon, index) in filteredPokemon" :key="index">
                         <router-link class="px-4" :to="`/pokemon/${urlIdLookup[pokemon.name]}`"> 
                             <span class="font-bold text-red-500">{{urlIdLookup[pokemon.name]}}</span>
