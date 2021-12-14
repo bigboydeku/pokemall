@@ -40,4 +40,17 @@ export default {
     min-width: fit-content;
   }
 
+  *::-webkit-scrollbar {
+    width: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: rgb(243, 23, 23);
+    border-radius: 20px;
+
+  }
+
+
 </style>

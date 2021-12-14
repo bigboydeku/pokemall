@@ -46,6 +46,6 @@ export default {
 
 <style>
   #nav a.router-link-exact-active {
-    background-color: red;
+    background-color: rgb(243, 23, 23);;
   }
 </style>
