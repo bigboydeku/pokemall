@@ -47,7 +47,7 @@ export default {
     background-color: transparent;
   }
   *::-webkit-scrollbar-thumb {
-    background-color: rgb(243, 23, 23);
+    background-color: rgb(148, 148, 148);
     border-radius: 20px;
 
   }

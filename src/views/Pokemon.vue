@@ -1,7 +1,7 @@
 <template>
   <main class="flex-1 flex overflow-hidden">
     <section class="min-w-0 flex-1 h-full flex flex-col bg-gray-50">
-        <div class="flex justify-center items-center flex-col h-full">
+        <div v-if="!pokemon" class="flex justify-center items-center flex-col h-full">
             <div class="pointer-events-none  inset-y-0 left-0 flex items-center justify-center pl-4">
                 <!-- Heroicon name: solid/search -->
                 <svg class="h-24 w-24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#C0C0C0" aria-hidden="true">
@@ -10,6 +10,24 @@
             </div>
             <div>
                 <h1 class="text-gray-600 ">Click on one of the pokemon on the left</h1>
+            </div>
+        </div>
+        <div v-else class="flex flex-auto h-screen bg-gray-50">
+            <div class="w-full overflow-y-auto">
+                <div class="h-24">top part</div>
+                <div class="bg-blue-400 h-screen overflow-y-auto flex justify-center">
+                    <div class="grid grid-cols-3 gap-2 w-full px-8 py-8">
+                        <div class="bg-white p-3 rounded row-span-2 col-span-2">1--{{pokemon}}</div>
+                        <div class="bg-white p-3 rounded row-span-2">2</div>
+                        <div class="bg-white p-3 rounded col-span-3">3</div>
+                        <div class="bg-white p-3 rounded">4</div>
+                        <div class="bg-white p-3 rounded">5</div>
+                        <div class="bg-white p-3 rounded">6</div>
+                        <div class="bg-white p-3 rounded">7</div>
+                        <div class="bg-white p-3 rounded">8</div>
+                        <div class="bg-white p-3 rounded">9</div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -43,8 +61,8 @@
 
             <div class="pb-2 overflow-auto ">
                 <div class="bg-white">
-                    <div class="hover:bg-red-100 border-b w-full py-1 px-4" v-for="(pokemon, index) in filteredPokemon" :key="index">
-                    <router-link class="px-4" :to="`/pokemon/${urlIdLookup[pokemon.name]}`"> 
+                    <div class="hover:bg-red-100 border-b w-full py-1" v-for="(pokemon, index) in filteredPokemon" :key="index">
+                    <router-link class="px-8 cursor-pointer block w-full h-full" @click="updateChosenPokemon(urlIdLookup[pokemon.name])" :to="`/pokemon/${urlIdLookup[pokemon.name]}`"> 
                         <span class="font-bold text-red-500">{{urlIdLookup[pokemon.name]}}</span>
                         {{pokemon.name}}
                     </router-link>
@@ -61,11 +79,13 @@ import {reactive, toRefs, computed} from 'vue'
 export default {
     data() {
         const state = reactive({
+            pokemon: null,
             pokemons: [],
             urlIdLookup: {},
             text: "",
             filteredPokemon: computed(() => updatePokemon()),
-            number_of_results: 0
+            number_of_results: 0,
+            
         })
 
         function updatePokemon() {
@@ -84,7 +104,23 @@ export default {
         }).then((data) => {
             state.filteredPokemon = data.results
         })
+
         return {...toRefs(state)}
+    }, methods: {
+        updateChosenPokemon(slug) {
+            fetch(`https://pokeapi.co/api/v2/pokemon/${slug}`)
+            .then(res => res.json())
+            .then((data) => {this.pokemon = data})
+        }
+    },
+    beforeMount() {
+        console.log(this.$route)
+        if (this.$route.matched[0].name !== 'pokemon') return
+        if (this.$route.params.slug) {
+            fetch(`https://pokeapi.co/api/v2/pokemon/${this.$route.params.slug}`)
+            .then(res => res.json())
+            .then((data) => {this.pokemon = data})
+        }
     }
 }
 </script>
