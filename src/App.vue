@@ -44,10 +44,10 @@ export default {
     width: 10px;
   }
   *::-webkit-scrollbar-track {
-    background-color: transparent;
+    background-color: rgb(243, 244, 246);
   }
   *::-webkit-scrollbar-thumb {
-    background-color: rgb(148, 148, 148);
+    background-color: rgb(168, 168, 168);
     border-radius: 20px;
 
   }

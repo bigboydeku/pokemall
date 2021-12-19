@@ -2,7 +2,7 @@
   <main class="flex-1 flex overflow-hidden">
     <section class="min-w-0 flex-1 flex flex-col bg-gray-50">
         <div v-if="!pokemon" class="flex flex-col h-full">
-            <div class="w-full py-4 bg-gray-800 h-24">
+            <div class="w-full py-4 bg-primary h-24">
                 <div class="mt-4 flex-shrink-0 flex flex-col space-y-2 md:mt-0 mx-auto">
                     <nav class="flex ml-8" aria-label="Breadcrumb">
                         <ol role="list" class="flex items-center space-x-4">
@@ -30,16 +30,16 @@
                 </div>
             </div>
             
-            <div class="flex justify-center flex-col items-center flex-1">
+            <div class="flex justify-center bg-gray flex-col items-center flex-1">
                 <svg class="h-24 w-24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#C0C0C0" aria-hidden="true">
                     <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                 </svg>
                 <h1 class="text-gray-600">Click on one of the pokemon on the left</h1>
             </div>
         </div>
-        <div v-else class="flex bg-gray-50">
-            <div class="w-full  overflow-y-auto">
-                <div class="border-b py-4 bg-gray-800">
+        <div v-else class="flex bg-gray overflow-y-auto">
+            <div class="w-full ">
+                <div class="border-b py-4 bg-primary">
                     <div class=" mt-4 flex-shrink-0 flex flex-col space-y-2 md:mt-0 mx-auto">
                         <nav class="flex ml-8" aria-label="Breadcrumb">
                             <ol role="list" class="flex items-center space-x-4">
@@ -76,24 +76,38 @@
                         <div class="flex-1 min-w-0 ml-8">
                             <div class="flex flex-row items-center">
                                 <h2 class="text-2xl font-bold leading-7 text-gray-200 hover:text-white sm:text-3xl sm:truncate">{{pokemon.name[0].toUpperCase() + pokemon.name.substring(1)}}</h2>
-                                <h2 class="text-md text-gray-200 hover:text-white sm:text-xl sm:truncate">#{{urlIdLookup[pokemon.name]}}</h2>
-                                <div v-for="type in pokemon.types" :key="type.slot" class="inline-flex ml-2 items-center px-2 py-1 rounded-full h-6 text-xs font-medium bg-gray-100 text-gray-800">{{type.type.name}}</div>
+                                <h2 class="text-md text-gray-200 ml-1 hover:text-white sm:text-xl sm:truncate">#{{urlIdLookup[pokemon.name]}}</h2>
+                                <div v-for="type in pokemon.types" :key="type.slot" :class="`inline-flex ml-2 items-center px-2 py-2 bg-type-${type.type.name} text-type-${type.type.name}-text rounded-xl h-5 text-xs font-medium bg-gray-100 text-gray-800`">{{type.type.name}}</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="bg-gray-100 h-screen flex justify-center">
-                    <div class="grid grid-cols-3 gap-2 w-full px-8 py-8">
-                        <div class="bg-white p-3 rounded row-span-2 col-span-2">1--{{pokemon}}</div>
-                        <div class="bg-white p-3 rounded row-span-2">{{pokemon.types}}</div>
-                        <div class="bg-white p-3 rounded col-span-3">3</div>
-                        <div class="bg-white p-3 rounded">4</div>
-                        <div class="bg-white p-3 rounded">5</div>
-                        <div class="bg-white p-3 rounded">6</div>
-                        <div class="bg-white p-3 rounded">7</div>
-                        <div class="bg-white p-3 rounded">8</div>
-                        <div class="bg-white p-3 rounded">9</div>
+                <div class="flex flex-row">
+                    <div class="h-screen flex justify-center w-10/12">
+                        <div class="grid grid-cols-3 gap-2 w-full px-8 py-8">
+                            <!-- General Information -->
+                            <div class="bg-white border-2 border-gray-300 p-3 rounded row-span-2 col-span-2">
+                                <div class="flex flex-row">
+                                    <h2 class="text-xl text-gray-700 leading-7 font-bold">{{pokemon.name}}</h2>
+                                    <div v-for="type in pokemon.types" :key="type.slot" :class="`inline-flex ml-2  items-center px-2 py-2 bg-type-${type.type.name} text-type-${type.type.name}-text rounded-xl h-5 text-xs font-sm text-gray-800`">{{type.type.name}}</div>
+                                </div>
+                                
+                            </div>
+                            <div class="bg-white p-3 rounded row-span-2">{{pokemon.types}}</div>
+                            <div class="bg-white p-3 rounded col-span-3">3</div>
+                            <div class="bg-white p-3 rounded">4</div>
+                            <div class="bg-white p-3 rounded">5</div>
+                            <div class="bg-white p-3 rounded">6</div>
+                            <div class="bg-white p-3 rounded">7</div>
+                            <div class="bg-white p-3 rounded">8</div>
+                            <div class="bg-white p-3 rounded">9</div>
+                        </div>
+                    </div>
+                    <!-- For advertisements -->
+                    <div class="flex flex-col mt-8 w-2/12">
+                        <div><img src="https://lineardesign.com/wp-content/uploads/2019/12/PayPal-Display-Ad-Example-160-X-600-1.jpg" alt="" class="basis-96"></div>
+                        <div><img src="https://lineardesign.com/wp-content/uploads/2019/12/Purple-Display-Ad-Example-160-X-600-1.jpg" alt="" class="basis-96"></div>
                     </div>
                 </div>
             </div>
@@ -122,15 +136,15 @@
             </div>
             </div>
 
-            <div class="border-b bg-gray-50 px-8 py-2">
+            <div class="border-b bg-gray px-8 py-2">
             <h2 class="h-full text-xs text-gray-500 font-bold flex items-center">Sorted by ID</h2>
             </div>
 
             <div class="pb-2 overflow-auto ">
                 <div class="bg-white">
-                    <div class="hover:bg-red-100 border-b w-full py-1" v-for="(pokemon, index) in filteredPokemon" :key="index">
+                    <div class="hover:bg-gray-100 border-b w-full py-1" v-for="(pokemon, index) in filteredPokemon" :key="index">
                     <router-link class="px-8 cursor-pointer block w-full h-full" @click="updateChosenPokemon(urlIdLookup[pokemon.name])" :to="`/pokemon/${urlIdLookup[pokemon.name]}`"> 
-                        <span class="font-bold text-red-500">{{urlIdLookup[pokemon.name]}}</span>
+                        <span class="font-bold text-secondary">{{urlIdLookup[pokemon.name]}}</span>
                         {{pokemon.name}}
                     </router-link>
                 </div>
@@ -181,7 +195,6 @@ export default {
             .then(res => res.json())
             .then((data) => {
                 this.pokemon = data
-                console.log(this.pokemon.types)
             })
         }
     },
@@ -192,7 +205,6 @@ export default {
             .then(res => res.json())
             .then((data) => {
                 this.pokemon = data
-                console.log(this.pokemon.types)
             })
         }
     }
