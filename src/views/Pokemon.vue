@@ -31,14 +31,12 @@
             </div>
             
             <div class="flex justify-center bg-gray flex-col items-center flex-1">
-                <svg class="h-24 w-24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#C0C0C0" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                </svg>
+                <img src="https://1.bp.blogspot.com/-YpxcVeA_Pl8/XTPoZK6E30I/AAAAAAABTyc/nRquAxOYXWIvDob9YHwsg0rCZzxFdeASQCLcBGAs/s400/kouji_yane_syuuri.png" alt="" class="w-2/12">
                 <h1 class="text-gray-600">Click on one of the pokemon on the left</h1>
             </div>
         </div>
         <div v-else class="flex bg-gray overflow-y-auto">
-            <div class="w-full ">
+            <div class=" ">
                 <div class="border-b py-4 bg-primary">
                     <div class=" mt-4 flex-shrink-0 flex flex-col space-y-2 md:mt-0 mx-auto">
                         <nav class="flex ml-8" aria-label="Breadcrumb">
@@ -92,10 +90,17 @@
                                     <h2 class="text-xl text-gray-700 leading-7 font-bold">{{pokemon.name}}</h2>
                                     <div v-for="type in pokemon.types" :key="type.slot" :class="`inline-flex ml-2  items-center px-2 py-2 bg-type-${type.type.name} text-type-${type.type.name}-text rounded-xl h-5 text-xs font-sm text-gray-800`">{{type.type.name}}</div>
                                 </div>
-                                
+                                <h2 class="text-sm text-gray-600"><span class="font-bold">{{pokemon_species.name}}</span>
+                                    (<span class="font-bold italic">日本語/Japanese:</span> {{pokemon_species.languages["roomaji"]}} {{pokemon_species.languages["ja-Hrkt"]}},
+                                    <span class="font-bold italic">Français/French:</span> {{pokemon_species.languages["fr"]}},
+                                    <span class="font-bold italic">German/Deutsch:</span> {{pokemon_species.languages["de"]}})
+                                    <span class="font-bold italic">Italian/Italiano:</span> {{pokemon_species.languages["it"]}})
+                                    <span class="font-bold italic">Chinese/中文:</span> {{pokemon_species.languages["zh-Hans"]}})
+                                    is a {{pokemon.types.length > 1? 'dual': pokemon.types[0].type.name}}-type pokemon introduced in <span class="font-semibold">{{pokemon_species.generation.name.replace("-", " ")}}</span>.
+                                </h2>
                             </div>
-                            <div class="bg-white p-3 rounded row-span-2">{{pokemon.types}}</div>
-                            <div class="bg-white p-3 rounded col-span-3">3</div>
+                            <div class="bg-white p-3 rounded row-span-2"></div>
+                            <div class="bg-white p-3 rounded col-span-3"></div>
                             <div class="bg-white p-3 rounded">4</div>
                             <div class="bg-white p-3 rounded">5</div>
                             <div class="bg-white p-3 rounded">6</div>
@@ -161,6 +166,7 @@ export default {
     data() {
         const state = reactive({
             pokemon: null,
+            pokemon_species: {},
             pokemons: [],
             urlIdLookup: {},
             text: "",
@@ -189,14 +195,26 @@ export default {
 
         return {...toRefs(state)}
     }, methods: {
+        // refactor into promise-based
         updateChosenPokemon(slug) {
             if (!slug) return this.pokemon = null
             fetch(`https://pokeapi.co/api/v2/pokemon/${slug}`)
             .then(res => res.json())
             .then((data) => {
                 this.pokemon = data
+                fetch(`https://pokeapi.co/api/v2/pokemon-species/${slug}/`)
+                .then(res_2 => res_2.json())
+                .then(data_species => {
+                    this.pokemon_species = data_species
+                    var languages = {};
+                    let arr = this.pokemon_species.names
+                    for (var i = 0; i < arr.length; i++) {
+                        languages[arr[i].language.name] = arr[i].name
+                    }
+                    this.pokemon_species["languages"] = languages
+                })
             })
-        }
+        },
     },
     beforeMount() {
         if (this.$route.matched[0].name !== 'pokemon') return
