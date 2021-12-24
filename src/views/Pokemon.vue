@@ -90,13 +90,22 @@
                                     <h2 class="text-xl text-gray-700 leading-7 font-bold">{{pokemon.name}}</h2>
                                     <div v-for="type in pokemon.types" :key="type.slot" :class="`inline-flex ml-2  items-center px-2 py-2 bg-type-${type.type.name} text-type-${type.type.name}-text rounded-xl h-5 text-xs font-sm text-gray-800`">{{type.type.name}}</div>
                                 </div>
-                                <h2 class="text-sm text-gray-600"><span class="font-bold">{{pokemon_species.name}}</span>
-                                    (<span class="font-bold italic">日本語/Japanese:</span> {{pokemon_species.languages["roomaji"]}} {{pokemon_species.languages["ja-Hrkt"]}},
-                                    <span class="font-bold italic">Français/French:</span> {{pokemon_species.languages["fr"]}},
-                                    <span class="font-bold italic">German/Deutsch:</span> {{pokemon_species.languages["de"]}})
-                                    <span class="font-bold italic">Italian/Italiano:</span> {{pokemon_species.languages["it"]}})
-                                    <span class="font-bold italic">Chinese/中文:</span> {{pokemon_species.languages["zh-Hans"]}})
-                                    is a {{pokemon.types.length > 1? 'dual': pokemon.types[0].type.name}}-type pokemon introduced in <span class="font-semibold">{{pokemon_species.generation.name.replace("-", " ")}}</span>.
+                                <h2 class="leading-2 text-sm">
+                                    <span class="font-bold">{{pokemon_species.languages["en"]}}</span>
+                                    <span class="italic text-gray-500"> (日本語/Japanese: {{pokemon_species.languages["roomaji"]}} {{pokemon_species.languages["ja-Hrkt"]}}, </span>
+                                    <span class="italic text-gray-500">Français/French: {{pokemon_species.languages["fr"]}}, </span>
+                                    <span class="italic text-gray-500">German/Deutsch: {{pokemon_species.languages["de"]}}, </span>
+                                    <span class="italic text-gray-500">Italian/Italiano: {{pokemon_species.languages["it"]}}, </span>
+                                    <span class="italic text-gray-500">Chinese/中文: {{pokemon_species.languages["zh-Hans"]}} )</span>
+                                    <span class="text-black"> 
+                                        is a {{pokemon.types.length > 1? 'dual': pokemon.types[0].type.name}}-type pokemon introduced in <span class="font-semibold">{{pokemon_species.generation.name.replace("-", " ")}}</span>
+                                    </span>.
+                                </h2>
+                                <h2 class="text-sm mt-2" v-if="pokemon_species.evolves_from_species">
+                                    {{pokemon_species.languages["en"]}} evolves from <router-link class="text-blue-500 hover:underline" @click="updateChosenPokemon(urlIdLookup[pokemon_species.evolves_from_species.name])" :to="`/pokemon/${urlIdLookup[pokemon_species.evolves_from_species.name]}`">{{pokemon_species.evolves_from_species.name}}</router-link>
+                                </h2>
+                                <h2 class="text-sm mt-2" v-else>
+                                    {{pokemon_species.languages["en"]}} is the beginning form of its evolution.
                                 </h2>
                             </div>
                             <div class="bg-white p-3 rounded row-span-2"></div>
@@ -165,10 +174,10 @@ import {reactive, toRefs, computed} from 'vue'
 export default {
     data() {
         const state = reactive({
-            pokemon: null,
-            pokemon_species: {},
-            pokemons: [],
-            urlIdLookup: {},
+            pokemon: null, //selected pokemon
+            pokemon_species: {}, //selected pokemon species
+            pokemons: [], //list of all pokemon
+            urlIdLookup: {}, //id look ups
             text: "",
             filteredPokemon: computed(() => updatePokemon()),
             number_of_results: 0,
@@ -198,33 +207,30 @@ export default {
         // refactor into promise-based
         updateChosenPokemon(slug) {
             if (!slug) return this.pokemon = null
-            fetch(`https://pokeapi.co/api/v2/pokemon/${slug}`)
-            .then(res => res.json())
-            .then((data) => {
-                this.pokemon = data
-                fetch(`https://pokeapi.co/api/v2/pokemon-species/${slug}/`)
-                .then(res_2 => res_2.json())
-                .then(data_species => {
-                    this.pokemon_species = data_species
-                    var languages = {};
-                    let arr = this.pokemon_species.names
-                    for (var i = 0; i < arr.length; i++) {
-                        languages[arr[i].language.name] = arr[i].name
-                    }
-                    this.pokemon_species["languages"] = languages
-                })
-            })
+            this.fetchPokemonData(slug)
         },
+        formatForeignNames(names) {
+            var languages = {};
+            let arr = names
+            for (var i = 0; i < arr.length; i++) {
+                languages[arr[i].language.name] = arr[i].name
+            }
+            return languages
+        },
+        fetchPokemonData(id) {
+            Promise.all([
+                fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(res => res.ok && res.json() || Promise.reject(res)),
+                fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`).then(res => res.ok && res.json() || Promise.reject(res))
+            ]).then(data => {
+                this.pokemon = data[0]
+                this.pokemon_species = data[1]
+                this.pokemon_species["languages"] = this.formatForeignNames(this.pokemon_species.names)
+            })
+        }
     },
     beforeMount() {
         if (this.$route.matched[0].name !== 'pokemon') return
-        if (this.$route.params.slug) {
-            fetch(`https://pokeapi.co/api/v2/pokemon/${this.$route.params.slug}`)
-            .then(res => res.json())
-            .then((data) => {
-                this.pokemon = data
-            })
-        }
+        if (this.$route.params.slug) this.fetchPokemonData(this.$route.params.slug)
     }
 }
 </script>
