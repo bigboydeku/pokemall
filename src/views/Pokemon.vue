@@ -101,12 +101,19 @@
                                         is a {{pokemon.types.length > 1? 'dual': pokemon.types[0].type.name}}-type pokemon introduced in <span class="font-semibold">{{pokemon_species.generation.name.replace("-", " ")}}</span>
                                     </span>.
                                 </h2>
-                                <h2 class="text-sm mt-2" v-if="pokemon_species.evolves_from_species">
-                                    {{pokemon_species.languages["en"]}} evolves from <router-link class="text-blue-500 hover:underline" @click="updateChosenPokemon(urlIdLookup[pokemon_species.evolves_from_species.name])" :to="`/pokemon/${urlIdLookup[pokemon_species.evolves_from_species.name]}`">{{pokemon_species.evolves_from_species.name}}</router-link>
-                                </h2>
-                                <h2 class="text-sm mt-2" v-else>
-                                    {{pokemon_species.languages["en"]}} is the beginning form of its evolution.
-                                </h2>
+                                <span v-for="(evolution) in pokemon_evolution_chain" :key="evolution">
+                                    <span v-if="evolution.evolves_to[0]">
+                                        <router-link class="cursor-pointer text-blue-500 hover:underline" @click="updateChosenPokemon(urlIdLookup[evolution.species.name])" :to="`/pokemon/${urlIdLookup[evolution.species.name]}`"> {{evolution.species.name[0].toUpperCase() + evolution.species.name.substring(1)}}</router-link> 
+                                        evolves into 
+                                        <router-link class="cursor-pointer text-blue-500 hover:underline" @click="updateChosenPokemon(urlIdLookup[evolution.evolves_to[0].species.name])" :to="`/pokemon/${urlIdLookup[evolution.evolves_to[0].species.name]}`"> {{evolution.evolves_to[0].species.name[0].toUpperCase() + evolution.evolves_to[0].species.name.substring(1)}}</router-link>
+                                        at level 
+                                        <span class="font-semibold">{{evolution.evolves_to[0].evolution_details[0].min_level}}</span>.
+                                    </span>
+                                    <span v-if="!evolution.evolves_to[0]">
+                                        <router-link class="cursor-pointer text-blue-500 font-semibold hover:underline" @click="updateChosenPokemon(urlIdLookup[evolution.species.name])" :to="`/pokemon/${urlIdLookup[evolution.species.name]}`"> {{evolution.species.name[0].toUpperCase() + evolution.species.name.substring(1)}}</router-link>      
+                                        {{evolution.species.name}} is the final form in its evolution chain.</span>
+                                    <!-- {{evolution.species.name}} evolves at level {{evolution.}} -->
+                                </span>
                             </div>
                             <div class="bg-white p-3 rounded row-span-2"></div>
                             <div class="bg-white p-3 rounded col-span-3"></div>
@@ -174,10 +181,11 @@ import {reactive, toRefs, computed} from 'vue'
 export default {
     data() {
         const state = reactive({
-            pokemon: null, //selected pokemon
-            pokemon_species: {}, //selected pokemon species
-            pokemons: [], //list of all pokemon
-            urlIdLookup: {}, //id look ups
+            pokemon: null,                                  //selected pokemon
+            pokemon_species: {},                            //selected pokemon species
+            pokemon_evolution_chain: null,                  //selected pokemon evolution chain
+            pokemons: [],                                   //list of all pokemon
+            urlIdLookup: {},                                //id look ups
             text: "",
             filteredPokemon: computed(() => updatePokemon()),
             number_of_results: 0,
@@ -217,14 +225,29 @@ export default {
             }
             return languages
         },
+        formatEvolutionChain(evolution_chain) {
+            let chain = [], temp = evolution_chain
+            chain.push(evolution_chain)
+            while(temp.evolves_to[0]) {
+                if (temp.evolves_to) {
+                    temp = temp.evolves_to[0]
+                    chain.push(temp)
+                }
+            }
+            return chain
+        },
         fetchPokemonData(id) {
             Promise.all([
                 fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(res => res.ok && res.json() || Promise.reject(res)),
-                fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`).then(res => res.ok && res.json() || Promise.reject(res))
+                fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`).then(res => res.ok && res.json() || Promise.reject(res)),
             ]).then(data => {
                 this.pokemon = data[0]
                 this.pokemon_species = data[1]
                 this.pokemon_species["languages"] = this.formatForeignNames(this.pokemon_species.names)
+                Promise.all([fetch(this.pokemon_species.evolution_chain.url).then(res => res.ok && res.json() || Promise.reject(res))]).then(data => {
+                    this.pokemon_evolution_chain = this.formatEvolutionChain(data[0].chain)
+                })
+                
             })
         }
     },
