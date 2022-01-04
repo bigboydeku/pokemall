@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row h-full">
+  <div class="flex md:flex-row h-full flex-col">
       <NavBar></NavBar>
       <router-view/>
   </div>
@@ -38,6 +38,8 @@ export default {
   body {
     display:block;
     min-width: fit-content;
+    overflow: auto;
+    height:100vh;
   }
 
   *::-webkit-scrollbar {

@@ -1,6 +1,6 @@
 <template>
   <main class="flex-1 flex overflow-hidden">
-    <section class="min-w-0 flex-1 flex flex-col bg-gray-50">
+    <section class="min-w-0 flex-1 flex flex-col bg-gray-50 ">
         <div v-if="!pokemon" class="flex flex-col h-full">
             <div class="w-full py-4 bg-primary h-24">
                 <div class="mt-4 flex-shrink-0 flex flex-col space-y-2 md:mt-0 mx-auto">
@@ -35,7 +35,7 @@
                 <h1 class="text-gray-600">Click on one of the pokemon on the left</h1>
             </div>
         </div>
-        <div v-else class="flex bg-gray overflow-y-auto">
+        <div v-else class="flex flex-col bg-gray overflow-y-auto">
             <div class=" ">
                 <div class="border-b py-4 bg-primary">
                     <div class=" mt-4 flex-shrink-0 flex flex-col space-y-2 md:mt-0 mx-auto">
@@ -81,41 +81,58 @@
                     </div>
                 </div>
                 
-                <div class="flex flex-row">
-                    <div class="h-screen flex justify-center w-10/12">
-                        <div class="grid grid-cols-3 gap-2 w-full px-8 py-8">
+                <div class="flex flex-row justify-center md:max-w-screen-xl max-w-full mx-auto">
+                    <div class="h-screen flex justify-center w-full md:w-10/12">
+                        <div class="grid grid-cols-3 gap-2 w-full md:px-8 px-1 py-8">
                             <!-- General Information -->
-                            <div class="bg-white border-2 border-gray-300 p-3 rounded row-span-2 col-span-2">
+                            <div class="bg-white border-2 border-gray-300 p-3 rounded col-span-3 md:col-span-2 flex flex-col">
+                                <!-- Main Name -->
                                 <div class="flex flex-row">
-                                    <h2 class="text-xl text-gray-700 leading-7 font-bold">{{pokemon.name}}</h2>
+                                    <h2 class="text-xl text-gray-700 leading-7 font-bold"> {{pokemon_species.languages["en"]}} </h2>
                                     <div v-for="type in pokemon.types" :key="type.slot" :class="`inline-flex ml-2  items-center px-2 py-2 bg-type-${type.type.name} text-type-${type.type.name}-text rounded-xl h-5 text-xs font-sm text-gray-800`">{{type.type.name}}</div>
                                 </div>
+                                <!-- Languages -->
                                 <h2 class="leading-2 text-sm">
-                                    <span class="font-bold">{{pokemon_species.languages["en"]}}</span>
                                     <span class="italic text-gray-500"> (日本語/Japanese: {{pokemon_species.languages["roomaji"]}} {{pokemon_species.languages["ja-Hrkt"]}}, </span>
                                     <span class="italic text-gray-500">Français/French: {{pokemon_species.languages["fr"]}}, </span>
                                     <span class="italic text-gray-500">German/Deutsch: {{pokemon_species.languages["de"]}}, </span>
                                     <span class="italic text-gray-500">Italian/Italiano: {{pokemon_species.languages["it"]}}, </span>
                                     <span class="italic text-gray-500">Chinese/中文: {{pokemon_species.languages["zh-Hans"]}} )</span>
-                                    <span class="text-black"> 
-                                        is a {{pokemon.types.length > 1? 'dual': pokemon.types[0].type.name}}-type pokemon introduced in <span class="font-semibold">{{pokemon_species.generation.name.replace("-", " ")}}</span>
-                                    </span>.
+                                    
                                 </h2>
-                                <span v-for="(evolution) in pokemon_evolution_chain" :key="evolution">
-                                    <span v-if="evolution.evolves_to[0]">
-                                        <router-link class="cursor-pointer text-blue-500 hover:underline" @click="updateChosenPokemon(urlIdLookup[evolution.species.name])" :to="`/pokemon/${urlIdLookup[evolution.species.name]}`"> {{evolution.species.name[0].toUpperCase() + evolution.species.name.substring(1)}}</router-link> 
-                                        evolves into 
-                                        <router-link class="cursor-pointer text-blue-500 hover:underline" @click="updateChosenPokemon(urlIdLookup[evolution.evolves_to[0].species.name])" :to="`/pokemon/${urlIdLookup[evolution.evolves_to[0].species.name]}`"> {{evolution.evolves_to[0].species.name[0].toUpperCase() + evolution.evolves_to[0].species.name.substring(1)}}</router-link>
-                                        at level 
-                                        <span class="font-semibold">{{evolution.evolves_to[0].evolution_details[0].min_level}}</span>.
-                                    </span>
-                                    <span v-if="!evolution.evolves_to[0]">
-                                        <router-link class="cursor-pointer text-blue-500 font-semibold hover:underline" @click="updateChosenPokemon(urlIdLookup[evolution.species.name])" :to="`/pokemon/${urlIdLookup[evolution.species.name]}`"> {{evolution.species.name[0].toUpperCase() + evolution.species.name.substring(1)}}</router-link>      
-                                        {{evolution.species.name}} is the final form in its evolution chain.</span>
-                                    <!-- {{evolution.species.name}} evolves at level {{evolution.}} -->
+                                <!-- Introduction -->
+                                <span class="text-black mt-3"> 
+                                       {{pokemon_species.languages["en"]}} is a {{pokemon.types.length > 1? 'dual': pokemon.types[0].type.name}}-type pokemon introduced in <span class="font-semibold">{{pokemon_species.generation.name.replace("-", " ")}}.</span>
                                 </span>
+                                <!-- Evolution chain -->
+                                <div class="w-full">
+                                    <div v-for="(evolution) in pokemon_evolution_chain" :key="evolution" class="inline">
+                                        <div v-if="evolution.evolves_to[0]" class="float-left">
+                                            <router-link class="cursor-pointer text-blue-500 hover:underline" @click="updateChosenPokemon(urlIdLookup[evolution.species.name])" :to="`/pokemon/${urlIdLookup[evolution.species.name]}`">{{evolution.species.name[0].toUpperCase() + evolution.species.name.substring(1)}}</router-link> 
+                                            evolves into 
+                                            <router-link class="cursor-pointer text-blue-500 hover:underline" @click="updateChosenPokemon(urlIdLookup[evolution.evolves_to[0].species.name])" :to="`/pokemon/${urlIdLookup[evolution.evolves_to[0].species.name]}`"> {{evolution.evolves_to[0].species.name[0].toUpperCase() + evolution.evolves_to[0].species.name.substring(1)}}</router-link>
+                                            at level 
+                                            <span class="font-semibold">{{evolution.evolves_to[0].evolution_details[0].min_level}}.&nbsp;</span>
+                                        </div>
+                                        <div v-if="!evolution.evolves_to[0]">
+                                            <router-link class="cursor-pointer text-blue-500 hover:underline" @click="updateChosenPokemon(urlIdLookup[evolution.species.name])" :to="`/pokemon/${urlIdLookup[evolution.species.name]}`">
+                                                {{evolution.species.name[0].toUpperCase() + evolution.species.name.substring(1)}}
+                                            </router-link> is the final form in its evolution chain.
+                                        </div>
+                                    </div>
+                                </div>
+                                
                             </div>
-                            <div class="bg-white p-3 rounded row-span-2"></div>
+                            <!-- Images -->
+                            <div class="bg-white border-2 border-gray-300 p-3 rounded col-span-3 md:col-span-2 flex flex-col">
+                                <div class="flex ml-4">
+                                    <h2 class="text-2xl font-bold leading-7 text-gray-800 hover:text-white sm:text-3xl sm:truncate">{{pokemon_species.languages["en"]}}</h2>
+                                    <h2 class="text-md text-gray-800 ml-1 sm:text-xl sm:truncate">#{{pokemon.name}}</h2>
+                                </div>
+                                {{pokemon.sprites['ultra-sun-ultra-moon']}}
+                                <div class="mx-auto align-middle p-12 "><img :src="pokemon.sprites.other['official-artwork']['front_default']" alt=""></div>
+
+                            </div>
                             <div class="bg-white p-3 rounded col-span-3"></div>
                             <div class="bg-white p-3 rounded">4</div>
                             <div class="bg-white p-3 rounded">5</div>
@@ -126,10 +143,10 @@
                         </div>
                     </div>
                     <!-- For advertisements -->
-                    <div class="flex flex-col mt-8 w-2/12">
+                    <!-- <div class="flex flex-col mt-8 w-2/12">
                         <div><img src="https://lineardesign.com/wp-content/uploads/2019/12/PayPal-Display-Ad-Example-160-X-600-1.jpg" alt="" class="basis-96"></div>
                         <div><img src="https://lineardesign.com/wp-content/uploads/2019/12/Purple-Display-Ad-Example-160-X-600-1.jpg" alt="" class="basis-96"></div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -246,9 +263,19 @@ export default {
                 this.pokemon_species["languages"] = this.formatForeignNames(this.pokemon_species.names)
                 Promise.all([fetch(this.pokemon_species.evolution_chain.url).then(res => res.ok && res.json() || Promise.reject(res))]).then(data => {
                     this.pokemon_evolution_chain = this.formatEvolutionChain(data[0].chain)
+                    // this.pokemon.sprites = this.collectPokemonImages(this.pokemon.sprites)
                 })
                 
             })
+        },
+        collectPokemonImages() {
+            // let obj = sprites.versions
+            // console.log(sprites)
+            // let size = Object.keys(obj).length
+            // console.log(Object.keys(obj['generation-i']))
+            //recursion later
+            // if (Object.keys(obj[size-1]).length <= 1) size--
+            // return obj[size]
         }
     },
     beforeMount() {
