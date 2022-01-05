@@ -1,7 +1,27 @@
 <template>
   <main class="flex-1 flex overflow-hidden">
-    <section class="min-w-0 flex-1 flex flex-col bg-gray-50 ">
-        <div v-if="!pokemon" class="flex flex-col h-full">
+    <section class="min-w-0 flex-1 flex flex-col bg-gray-50">
+        <div v-if="!showList" class="bg-primary md:pt-2 flextext-white cursor-pointer" @click="toggleListView()">
+            
+            <div class="flex space-x-2 text-white px-4 py-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                </svg>
+                <h1>Show List</h1>
+            </div>
+        </div>
+
+        <div v-else class="bg-primary md:pt-2 flex text-white cursor-pointer" @click="toggleListView()">
+            <div class=" flex space-x-2 text-white px-4 py-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                <h2>Hide List</h2>
+            </div>
+            
+        </div>
+
+        <div v-if="!pokemon" class="flex flex-col h-full" @click="toggleListView(false)">
             <div class="w-full py-4 bg-primary h-24">
                 <div class="mt-4 flex-shrink-0 flex flex-col space-y-2 md:mt-0 mx-auto">
                     <nav class="flex ml-8" aria-label="Breadcrumb">
@@ -35,7 +55,7 @@
                 <h1 class="text-gray-600">Click on one of the pokemon on the left</h1>
             </div>
         </div>
-        <div v-else class="flex flex-col bg-gray overflow-y-auto">
+        <div v-else class="flex flex-col bg-gray overflow-y-auto" @click="toggleListView(false)">
             <div class=" ">
                 <div class="border-b py-4 bg-primary">
                     <div class=" mt-4 flex-shrink-0 flex flex-col space-y-2 md:mt-0 mx-auto">
@@ -124,7 +144,7 @@
                                 
                             </div>
                             <!-- Images -->
-                            <div class="bg-white border-2 border-gray-300 p-3 rounded col-span-3 md:col-span-2 flex flex-col">
+                            <div class="bg-white border-2 border-gray-300 p-3 rounded col-span-3 md:col-span-1 flex flex-col">
                                 <div class="flex ml-4">
                                     <h2 class="text-2xl font-bold leading-7 text-gray-800 hover:text-white sm:text-3xl sm:truncate">{{pokemon_species.languages["en"]}}</h2>
                                     <h2 class="text-md text-gray-800 ml-1 sm:text-xl sm:truncate">#{{pokemon.name}}</h2>
@@ -152,8 +172,8 @@
         </div>
     </section>
 
-    <aside class="hidden lg:block lg:flex-shrink-0 lg:order-first overflow-y-hidden">
-        <div class="h-full relative flex flex-col w-72 border-r border-gray-200 overflow-y-auto">
+    <aside v-if="showList" class=" md:relative md:block lg:flex-shrink-0 order-first max-h-screen absolute p-0 ">
+        <div class="h-full relative  md:w-72 xs:w-48 border-r border-gray-200 overflow-y-auto">
             <div class="">
                 <div class="min-w-0 h-16 w-full flex-1">
                     <div class="max-w-2xl h-full relative text-gray-400 border-b focus-within:text-gray-500">
@@ -178,14 +198,14 @@
             <h2 class="h-full text-xs text-gray-500 font-bold flex items-center">Sorted by ID</h2>
             </div>
 
-            <div class="pb-2 overflow-auto ">
+            <div class="pb-2 max-h-screen">
                 <div class="bg-white">
                     <div class="hover:bg-gray-100 border-b w-full py-1" v-for="(pokemon, index) in filteredPokemon" :key="index">
-                    <router-link class="px-8 cursor-pointer block w-full h-full" @click="updateChosenPokemon(urlIdLookup[pokemon.name])" :to="`/pokemon/${urlIdLookup[pokemon.name]}`"> 
-                        <span class="font-bold text-secondary">{{urlIdLookup[pokemon.name]}}</span>
-                        {{pokemon.name}}
-                    </router-link>
-                </div>
+                        <router-link class="px-8 cursor-pointer block w-full h-full" @click="updateChosenPokemon(urlIdLookup[pokemon.name])" :to="`/pokemon/${urlIdLookup[pokemon.name]}`"> 
+                            <span class="font-bold text-secondary">{{urlIdLookup[pokemon.name]}}</span>
+                            {{pokemon.name}}
+                        </router-link>
+                    </div>
                 </div>
             </div>
         </div>
@@ -206,7 +226,7 @@ export default {
             text: "",
             filteredPokemon: computed(() => updatePokemon()),
             number_of_results: 0,
-            
+            showList: false
         })
 
         function updatePokemon() {
@@ -229,6 +249,14 @@ export default {
 
         return {...toRefs(state)}
     }, methods: {
+        toggleListView(flag) {
+            if (flag == null)
+                this.showList = !this.showList
+            else if (flag && window.innerWidth < 768)
+                this.showList = true
+            else if (!flag && window.innerWidth < 768)
+                this.showList = false
+        },
         // refactor into promise-based
         updateChosenPokemon(slug) {
             if (!slug) return this.pokemon = null
@@ -297,5 +325,9 @@ export default {
     margin-left: .4em;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23777'><path d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/></svg>");
     cursor: pointer;
+}
+
+.view-list {
+    fill: white;
 }
 </style>

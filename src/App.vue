@@ -1,6 +1,6 @@
 <template>
   <div class="flex md:flex-row h-full flex-col">
-      <NavBar></NavBar>
+      <NavBar class="z-50"></NavBar>
       <router-view/>
   </div>
   

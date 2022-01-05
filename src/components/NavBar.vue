@@ -18,7 +18,7 @@
     </div>
     
 
-    <nav class="bg-white shadow md:hidden block">
+    <nav class="bg-white shadow md:hidden block z-40">
       <div class="mx-auto">
           <div class="md:flex justify-between items-center">
               <!-- left section -->
